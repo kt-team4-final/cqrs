@@ -23,6 +23,7 @@ tr:nth-child(even) {
 <body>
 <h1><img style="width:50px" src = "http://d1dguf1vkx6mh8.cloudfront.net/iconfinder_travel-transmit-route-tourism-flight_5728208.png"/>
 비행기 예약시스템</h1>
+<p id="showData"></p>
 <table>
   <tr>
     <th>FlightId</th>
@@ -49,7 +50,6 @@ tr:nth-child(even) {
 <script  src="http://code.jquery.com/jquery-latest.min.js"></script>
 <script>
 $(document).ready(function(){
-	var test = '{    "_embedded": {        "flightStatuses": [            {                "_links": {                    "flightStatus": {                        "href": "http://localhost:8084/flightStatuses/1"                    },                    "self": {                        "href": "http://localhost:8084/flightStatuses/1"                    }                },                "flightName": "CH777",                "price": null,                "seat": 40,                "status": "new flight"            }        ]    },    "_links": {        "profile": {            "href": "http://localhost:8084/profile/flightStatuses"        },        "self": {            "href": "http://localhost:8084/flightStatuses"        }    }}';
 	var qry = '/flightStatuses'
 	var result;
 	var xmlHttp = new XMLHttpRequest();
@@ -57,15 +57,21 @@ $(document).ready(function(){
     xmlHttp.send( null );
     xmlHttp.responseText;
 
-    result = JSON.parse(test);
-	document.getElementById("flight-data").innerHTML=result._embedded.flightStatuses[0];
     var str;
     if(xmlHttp.responseText != null){
-    	result = JSON.parse(xmlHttp.responseText.toString());
+    	result = JSON.parse(xmlHttp.responseText);
     	var data = result._embedded;
+    	var arr = [];
     	if(data!=null){
-    		result = JSON.stringify(xmlHttp.responseText).replace('\r\n','');
-    		//document.getElementById("flight-data").innerHTML=result;
+    		result = xmlHttp.responseText;
+    		result = result.substring(result.indexOf("flightName")-12,result.lastIndexOf("links")-12);
+    		while(result.indexOf("flightName")>0){
+    			arr.push(result.substring(1,76));
+    			//"flightName" : "CH777", "seat" : 40, "price" : null, "status" : "new flight"
+    			break;
+    		}
+    	    result = result.split(" } } }");
+    		document.getElementById("flight-data").innerHTML=result.substring(1,76)//arr[0];
     		data = JSON.parse(result);
     	} else {
     		str = "no data in cqrs "+data
@@ -74,8 +80,76 @@ $(document).ready(function(){
     } else {
     	alert("no response: flightStatuses");
     }
+    
+    var myBooks = [
+        {
+            "Book ID": "1",
+            "Book Name": "Computer Architecture",
+            "Category": "Computers",
+            "Price": "125.60"
+        },
+        {
+            "Book ID": "2",
+            "Book Name": "Asp.Net 4 Blue Book",
+            "Category": "Programming",
+            "Price": "56.00"
+        },
+        {
+            "Book ID": "3",
+            "Book Name": "Popular Science",
+            "Category": "Science",
+            "Price": "210.40"
+        }
+    ]
+
+    myBooks = JSON.parse(result);
+    myBooks = myBooks.flightStatuses;
+    var myBook = JSON.parse(myBooks.flightStatuses);
+	document.getElementById("flight-data").innerHTML=myBook.flightName;
+    
+    // EXTRACT VALUE FOR HTML HEADER. 
+    // ('Book ID', 'Book Name', 'Category' and 'Price')
+    var col = [];
+    for (var i = 0; i < myBooks.length; i++) {
+        for (var key in myBooks[i]) {
+            if (col.indexOf(key) === -1) {
+                col.push(key);
+            }
+        }
+    }
+
+    // CREATE DYNAMIC TABLE.
+    var table = document.createElement("table");
+
+    // CREATE HTML TABLE HEADER ROW USING THE EXTRACTED HEADERS ABOVE.
+
+    var tr = table.insertRow(-1);                   // TABLE ROW.
+
+    for (var i = 0; i < col.length; i++) {
+        var th = document.createElement("th");      // TABLE HEADER.
+        th.innerHTML = col[i];
+        tr.appendChild(th);
+    }
+
+    // ADD JSON DATA TO THE TABLE AS ROWS.
+    for (var i = 0; i < myBooks.length; i++) {
+
+        tr = table.insertRow(-1);
+
+        for (var j = 0; j < col.length; j++) {
+            var tabCell = tr.insertCell(-1);
+            tabCell.innerHTML = myBooks[i][col[j]];
+        }
+    }
+
+    // FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
+    var divContainer = document.getElementById("showData");
+    divContainer.innerHTML = "";
+    divContainer.appendChild(table);
   		  
 })
+
+
 </script>
 </body>
 </html>
