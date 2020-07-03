@@ -3,29 +3,69 @@
 <head>
 <meta charset="EUC-KR">
 <title>Insert title here</title>
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+</style>
 </head>
 <body>
 <h1><img style="width:50px" src = "http://d1dguf1vkx6mh8.cloudfront.net/iconfinder_travel-transmit-route-tourism-flight_5728208.png"/>
 비행기 예약시스템</h1>
-<output id="weahter"></output>
+<table>
+  <tr>
+    <th>FlightId</th>
+    <th>FlightName</th>
+    <th>좌석수</th>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>CH777</td>
+    <td>10</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>CH888</td>
+    <td>40</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>CH111</td>
+    <td>100</td>
+  </tr>
+</table>
 <p id="flight-data"></p>
 <script  src="http://code.jquery.com/jquery-latest.min.js"></script>
 <script>
 $(document).ready(function(){
+	var test = '{    "_embedded": {        "flightStatuses": [            {                "_links": {                    "flightStatus": {                        "href": "http://localhost:8084/flightStatuses/1"                    },                    "self": {                        "href": "http://localhost:8084/flightStatuses/1"                    }                },                "flightName": "CH777",                "price": null,                "seat": 40,                "status": "new flight"            }        ]    },    "_links": {        "profile": {            "href": "http://localhost:8084/profile/flightStatuses"        },        "self": {            "href": "http://localhost:8084/flightStatuses"        }    }}';
 	var qry = '/flightStatuses'
 	var result;
 	var xmlHttp = new XMLHttpRequest();
     xmlHttp.open( "GET", qry, false ); // false for synchronous request
     xmlHttp.send( null );
     xmlHttp.responseText;
-    
+
+    result = JSON.parse(test);
+	document.getElementById("flight-data").innerHTML=result._embedded.flightStatuses[0];
     var str;
     if(xmlHttp.responseText != null){
     	result = JSON.parse(xmlHttp.responseText.toString());
     	var data = result._embedded;
     	if(data!=null){
     		result = JSON.stringify(xmlHttp.responseText).replace('\r\n','');
-    		document.getElementById("flight-data").innerHTML=result;
+    		//document.getElementById("flight-data").innerHTML=result;
     		data = JSON.parse(result);
     	} else {
     		str = "no data in cqrs "+data
