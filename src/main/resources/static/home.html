@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="EUC-KR">
+<title>Insert title here</title>
+</head>
+<body>
+<h1><img style="width:50px" src = "https://team4-s3.s3-ap-northeast-1.amazonaws.com/iconfinder_travel-transmit-route-tourism-flight_5728208.png"/>
+비행기 예약시스템</h1>
+<output id="weahter"></output>
+<p id="flight-data"></p>
+<script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script>
+$(document).ready(function(){
+	var qry = '/flightStatuses'
+	var result;
+	var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", qry, false ); // false for synchronous request
+    xmlHttp.send( null );
+    xmlHttp.responseText;
+    
+    var str;
+    if(xmlHttp.responseText != null){
+    	result = JSON.parse(xmlHttp.responseText.toString());
+    	var data = result._embedded;
+    	if(data!=null){
+    		result = JSON.stringify(xmlHttp.responseText).replace('\r\n','');
+    		document.getElementById("flight-data").innerHTML=result;
+    		data = JSON.parse(result);
+    	} else {
+    		str = "no data in cqrs "+data
+    		alert(str)
+    	}
+    } else {
+    	alert("no response: flightStatuses");
+    }
+  		  
+})
+</script>
+</body>
+</html>
